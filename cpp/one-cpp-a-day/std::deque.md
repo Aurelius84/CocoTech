@@ -21,7 +21,6 @@
 ```cpp
 #include <iostream>
 #include <deque>
-
 int main()
 {
     // Create a deque containing integers
