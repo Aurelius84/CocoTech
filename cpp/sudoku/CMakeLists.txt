@@ -1,5 +1,5 @@
 # cmake 最低的版本要求
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.4)
 
 # 工程名
 PROJECT(sudoku)
