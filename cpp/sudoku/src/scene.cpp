@@ -163,8 +163,8 @@ bool CScene::isComplete() {
         }
       }
     }
-    return true;
   }
+  return true;
 }
 
 void CScene::setValue(const point_t &p, const int value) {
