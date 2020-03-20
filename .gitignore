@@ -36,3 +36,6 @@
 .vscode/*
 *test*/*
 .idea/*
+
+# cmake dir
+cmake-build*
