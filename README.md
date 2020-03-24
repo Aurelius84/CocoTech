@@ -1,6 +1,6 @@
 # CocoTech
 
-## 1. 设计模式学习
+## 1. [设计模式学习](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#1%E5%B8%B8%E8%A7%81%E7%9A%84%E4%B8%89%E7%A7%8D%E6%9C%80%E5%9F%BA%E6%9C%AC%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F)
 
 ### 1.1 [创建模式](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#2%E8%AF%A6%E7%BB%86%E7%9A%84%E6%A8%A1%E5%BC%8F%E4%BB%8B%E7%BB%8D)
 
