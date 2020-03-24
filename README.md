@@ -2,7 +2,7 @@
 
 ## 1. 设计模式学习
 
-### 1.1 创建模式
+### 1.1 [创建模式](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#2%E8%AF%A6%E7%BB%86%E7%9A%84%E6%A8%A1%E5%BC%8F%E4%BB%8B%E7%BB%8D)
 
 提供实例化的方法，为适合的情况提供相应的创建方法。
 
@@ -12,7 +12,7 @@
 - Prototype (原型)
 - Singleton (单例)
 
-### 1.2 结构化模式
+### 1.2 [结构化模式](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#22-%E7%BB%93%E6%9E%84%E5%9E%8B)
 
 用于处理实体之间的关系，使得这些实体可以更好的协同工作。
 
@@ -42,7 +42,7 @@
 
 ## 2. C++项目
 
-### 2.1 数独游戏
+### 2.1 [数独游戏](https://github.com/Aurelius84/CocoTech/tree/master/cpp/sudoku#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84)
 
 一款简单的终端数独游戏，可以帮助快速入门C++，fork的其他开源的实现，以供学习（侵删）。
 
