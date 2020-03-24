@@ -244,26 +244,103 @@
     - 当这个唯一实例可以通过子类扩展，且client无需更改代码就能使用一个扩展的实例
 
 3. **样例Demo**
-```python
-class Singleton(object):
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, '_instance'):
-            org = super(Singleton, cls)
-            cls._instance = org.__new__(cls, *args, **kwargs)
-        return cls._instance
-
-class SingleSpam(Singleton):
-    def __init__(self, s):
-        self.s = s
+    ```python
+    class Singleton(object):
+        def __new__(cls, *args, **kwargs):
+            if not hasattr(cls, '_instance'):
+                org = super(Singleton, cls)
+                cls._instance = org.__new__(cls, *args, **kwargs)
+            return cls._instance
     
-    def __str__(self):
-        return self.s
+    class SingleSpam(Singleton):
+        def __init__(self, s):
+            self.s = s
+        
+        def __str__(self):
+            return self.s
+    
+    if __name__ == '__main__':
+        spam = SingleSpam('spam')
+        print(id(spam), spam)
+    
+        spa = SingleSpam('spa')
+        print(id(spa), spa)
+        print(id(spam), spam)
+    ```
 
-if __name__ == '__main__':
-    spam = SingleSpam('spam')
-    print(id(spam), spam)
+### 2.1 创建型
 
-    spa = SingleSpam('spa')
-    print(id(spa), spa)
-    print(id(spam), spam)
-```
+#### Factory Method (工厂方法)
+
+![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/adapter_class.jpeg)
+
+1. **作用**
+
+    将一个类的接口转换为client想要的另一个接口。Adapter模式使得原本由于接口不兼容而无法一起协作的类，可以重新协作。
+
+2. **适用场景**
+
+    - 试图使用一个已经存在的但接口不符合你需求的类
+    - 试图创建一个可复用的类，此类可以与其他不相关的类或不可预见的类协同工作
+    - 试图使用已存在的子类，但无法对每一个都进行子类话以匹配他们的接口。
+
+3. **样例Demo**
+    ```python
+    import os
+    
+    class Dog(object):
+        def __init__(self):
+            self.name = "Dog"
+    
+        def bark(self):
+            return "woof"
+    
+    class Cat(object):
+        def __init__(self):
+            self.name = "Cat"
+    
+        def meow(self):
+            return "meow"
+    
+    class Human(object):
+        def __init__(self):
+            self.name = "Human"
+    
+        def speak(self):
+            return "hello"
+    
+    class Car(object):
+        def __init__(self):
+            self.name = "Car"
+    
+        def make_noise(self, octane_level):
+            return "vroom" % ("!" * octane_level)
+    
+    
+    class Adapter(object):
+        def __init__(self, obj, adapted_methods):
+            self.obj = obj
+            self.__dict__.update(adapted_methods)
+    
+        def __getattr__(self, item):
+            return getattr(self.obj, attr)
+    
+    
+    def main():
+        objects = []
+        dog = Dog()
+        objects.append(Adapter(dog, dict(make_noise=dog.bark)))
+        cat = Cat()
+        objects.append(Adapter(cat, dict(make_noise=cat.meow)))
+        human = Human()
+        objects.append(Adapter(human, dict(make_noise=human.speak)))
+        car = Car()
+        car_noise = lambda: car.make_noise(3)
+        objects.append(Adapter(car, dict(make_noise=car_noise)))
+    
+        for obj in objects:
+            print("{0} said {1}".format(obj.name, obj.make_noise()))
+    
+    if __name__ == "__main__":
+        main()
+    ```
