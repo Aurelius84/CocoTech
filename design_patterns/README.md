@@ -9,7 +9,7 @@
 
 3. **行为模式**
    
-   用于不同的实体进行通信，为实体之间的通信提供更容易、更灵活的同你方法。
+   用于不同的实体进行通信，为实体之间的通信提供更容易、更灵活的通信方法。
 
 ## 2.详细的模式介绍
 ### 2.1 创建型
@@ -268,9 +268,9 @@
         print(id(spam), spam)
     ```
 
-### 2.1 创建型
+### 2.2 结构型
 
-#### Factory Method (工厂方法)
+#### Adapter Class/Object (适配器)
 
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/adapter_class.jpeg)
 
