@@ -344,3 +344,65 @@
     if __name__ == "__main__":
         main()
     ```
+   
+#### Bridge (桥接)
+
+![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/bridge.jpeg)
+
+1. **作用**
+
+    将抽象的部分与其实现部分分离，使它们均可以独立的变化
+
+2. **适用场景**
+
+    - 试图解耦抽象与实现部分。
+    - 类的抽象以及它的实现都可以通过生成子类的方法进行扩充。
+    - 对一个抽象的实现部分进行修改，应对client不产生影响，即client不需要重新编译。
+
+3. **样例Demo**
+    ```python
+    # ConcreteImplementor
+    class DrawingApi1(object):
+    
+        def draw_circle(self, x, y, radius):
+    
+            print("Api_1.circle at {}:{} radius {}".format(x, y, radius))
+    
+    # ConcreteImplementor
+    class DrawingApi2(object):
+    
+        def draw_circle(self, x, y, radius):
+    
+            print("Api_1.circle at {}:{} radius {}".format(x, y, radius))
+    
+    
+    # Abstraction
+    class CircleShape(object):
+        def __init__(self, x, y, radius, drawing_api):
+            self._x = x
+            self._y = y
+            self._radius = radius
+            self._drawing_api = drawing_api
+    
+        # low level, i.e. implementation
+        def draw(self):
+            self._drawing_api.draw_circle(self._x, self._y, self._radius)
+    
+        # high level i.e. Abstraction
+        def scale(self, pct):
+            self._radius *= pct
+    
+    
+    def main():
+        shapes = (
+            CircleShape(1, 2, 3, DrawingApi1()),
+            CircleShape(5, 7, 11, DrawingApi2())
+        )
+        
+        for shape in shapes:
+            shape.scale(2.5)
+            shape.draw()
+    
+    if __name__ == '__main__':
+        main()
+    ```
