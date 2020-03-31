@@ -407,7 +407,7 @@
 ![Composite](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/composite.jpeg)
 
 1. **作用**
-    > 将object组合成`树形`结构，以表示`部分-整体`的层次结构，使得client对单个对象和组合对象的使用，更具有一致性。
+    > 将object组合成**树形**结构，以表示**部分-整体**的层次结构，使得client对单个对象和组合对象的使用，更具有一致性。
 
 2. **适用场景**
 
