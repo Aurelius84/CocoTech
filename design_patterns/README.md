@@ -1,15 +1,15 @@
 ## 1.常见的三种最基本的设计模式
 1. **创建模式**
    
-   提供实例化的方法，为适合的情况提供相应的创建方法。
+   > 提供实例化的方法，为适合的情况提供相应的创建方法。
    
 2. **结构化模式**
 
-   用于处理实体之间的关系，使得这些实体可以更好的协同工作。
+   > 用于处理实体之间的关系，使得这些实体可以更好的协同工作。
 
 3. **行为模式**
    
-   用于不同的实体进行通信，为实体之间的通信提供更容易、更灵活的通信方法。
+   > 用于不同的实体进行通信，为实体之间的通信提供更容易、更灵活的通信方法。
 
 ## 2.详细的模式介绍
 ### 2.1 创建型
@@ -112,8 +112,7 @@
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/builder.jpeg)
 
 1. **作用**
-
-    将一个复杂对象的**构建**与它的**表示**分离开来，使得同样的构建过程可以创建不同的表示。
+    > 将一个复杂对象的**构建**与它的**表示**分离开来，使得同样的构建过程可以创建不同的表示。
 
 
 2. **适用场景**
@@ -183,8 +182,7 @@
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/prototype.jpeg)
 
 1. **作用**
-
-    使用原型实例来创建对象，并通过copy这些原型来创建新的对象。
+    > 使用原型实例来创建对象，并通过copy这些原型来创建新的对象。
 
 2. **适用场景**
 
@@ -235,8 +233,7 @@
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/singleton.jpeg)
 
 1. **作用**
-
-    保证一个类只有一个实例存在
+    > 保证一个类只有一个实例存在
 
 2. **适用场景**
 
@@ -275,8 +272,7 @@
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/adapter_class.jpeg)
 
 1. **作用**
-
-    将一个类的接口转换为client想要的另一个接口。Adapter模式使得原本由于接口不兼容而无法一起协作的类，可以重新协作。
+    > 将一个类的接口转换为client想要的另一个接口。Adapter模式使得原本由于接口不兼容而无法一起协作的类，可以重新协作。
 
 2. **适用场景**
 
@@ -350,8 +346,7 @@
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/bridge.jpeg)
 
 1. **作用**
-
-    将抽象的部分与其实现部分分离，使它们均可以独立的变化
+    > 将抽象的部分与其实现部分分离，使它们均可以独立的变化
 
 2. **适用场景**
 
@@ -412,8 +407,7 @@
 ![Composite](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/composite.jpeg)
 
 1. **作用**
-
-    将object组合成`树形`结构，以表示`部分-整体`的层次结构，使得client对单个对象和组合对象的使用，更具有一致性。
+    > 将object组合成`树形`结构，以表示`部分-整体`的层次结构，使得client对单个对象和组合对象的使用，更具有一致性。
 
 2. **适用场景**
 
@@ -474,8 +468,7 @@
 ![Decorator](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/decorator.jpeg)
 
 1. **作用**
-
-    动态地给一个对象添加一些额外功能。从用法上，装饰器模式比生成子类的方式更加灵活。
+    > 动态地给一个对象添加一些额外功能。从用法上，装饰器模式比生成子类的方式更加灵活。
 
 2. **适用场景**
 
