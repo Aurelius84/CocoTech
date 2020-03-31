@@ -14,7 +14,7 @@
 ## 2.详细的模式介绍
 ### 2.1 创建型
 
-#### Factory Method (工厂方法)
+#### 1. Factory Method (工厂方法)
 
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/factory_method.jpeg)
 
@@ -51,7 +51,7 @@
         print(e.get(text), g.get(text))
     ```
 
-#### Abstract Factory (抽象工厂)
+#### 2. Abstract Factory (抽象工厂)
 
 1. **作用**
     > 提供一个创建相关或者相互依赖对象的接口，而无需指定它们具体的类。
@@ -107,7 +107,7 @@
     def get_factory():
         return random.choice([DogFactory, CatFactory])
     ```
-#### Builder (建造者)
+#### 3. Builder (建造者)
 
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/builder.jpeg)
 
@@ -178,7 +178,7 @@
    ```
 
 
-#### Prototype (原型)
+#### 4. Prototype (原型)
 
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/prototype.jpeg)
 
@@ -230,7 +230,7 @@
         main()
     ```
 
-#### Singleton (单例)
+#### 5. Singleton (单例)
 
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/singleton.jpeg)
 
@@ -270,7 +270,7 @@
 
 ### 2.2 结构型
 
-#### Adapter Class/Object (适配器)
+#### 6. Adapter Class/Object (适配器)
 
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/adapter_class.jpeg)
 
@@ -345,7 +345,7 @@
         main()
     ```
    
-#### Bridge (桥接)
+#### 7. Bridge (桥接)
 
 ![Factory Method](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/bridge.jpeg)
 
@@ -406,3 +406,66 @@
     if __name__ == '__main__':
         main()
     ```
+  
+#### 8. Composite(组合)
+
+![Composite](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/composite.jpeg)
+
+1. **作用**
+
+    将object组合成`树形`结构，以表示`部分-整体`的层次结构，使得client对单个对象和组合对象的使用，更具有一致性。
+
+2. **适用场景**
+
+    - 对部分-整体层次结构有需要
+    - 希望client忽略组合对象和单个对象的不同，统一使用组合结构的岁哦有对象
+
+3. **样例Demo**
+
+    ```python
+    # Abstraction
+    class Component(object):
+        def __init__(self, name):
+            self._name = name
+    
+        def add(self, com):
+            pass
+    
+        def display(self, depth):
+            pass
+    # Instance
+    class Leaf(Component):
+        def add(self, com):
+            print("leaf can not add")
+    
+        def display(self, depth):
+            name = "-" * depth
+            name += self._name
+            print(name)
+    
+    
+    class Composite(Component):
+        def __init__(self, name):
+            super(Composite).__init__(name)
+            self.entities = []
+    
+        def add(self, entity):
+            self.entities.append(entity)
+        
+        def display(self, depth):
+            name = "-" * depth
+            name += self._name
+            for entity in self.entities:
+                entity.display(depth+2)
+    
+    
+    if __name__ == "__main__":
+        p = Composite("Wong")
+        p.add(Leaf("Lee"))
+        p.add(Leaf("Zhao"))
+        p1 = Composite("Wu")
+        p1.add(Leaf("San"))
+        p.add(p1)
+        p.display(1)
+    ```
+
