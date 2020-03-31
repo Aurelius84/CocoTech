@@ -468,4 +468,49 @@
         p.add(p1)
         p.display(1)
     ```
+   
+#### 9. Decorator(装饰器)
+
+![Decorator](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/decorator.jpeg)
+
+1. **作用**
+
+    动态地给一个对象添加一些额外功能。从用法上，装饰器模式比生成子类的方式更加灵活。
+
+2. **适用场景**
+
+    - 在不影响其他对象的情况下，以动态、透明的方式给单个对象添加职责
+    - 处理可撤销的职责
+    - 无法采用生成子类的方法进行扩充的情况:
+        - 可能存在大量独立的扩展，为支持每一种组合，将会产生大量的子类，子类数目爆炸增长
+        - 类定义可能被隐藏，或类定义不能用于生成子类
+
+3. **样例Demo**
+
+    ```python
+    class Foo(object):
+        def func1(self):
+            print("original func1")
+    
+        def func2(self):
+            print("original func2")
+    
+    class FooDecorator(object):
+        def __init__(self, decorator):
+            self._decorator = decorator
+    
+        def func1(self):
+            print("decorated func1")
+            self._decorator.func1()
+    
+        def __getattr__(self, item):
+            return getattr(self._decorator, item)
+    
+    
+    if __name__ == '__main__':
+        foo = Foo()
+        foo_decorator = FooDecorator(foo)
+        foo_decorator.func1()
+        foo_decorator.func2()
+    ```
 
