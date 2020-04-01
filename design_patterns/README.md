@@ -584,7 +584,7 @@
         test_runner.run_all()
     ```
    
-#### 10. Flyweight (享元)
+#### 11. Flyweight (享元)
 
 ![Flyweight](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/flyweight.jpeg)
 
@@ -624,4 +624,57 @@
         print(c1, c2)
         print(c1 == c2)
         print(id(c1), id(c2))
+    ```
+   
+#### 12. Proxy (代理)
+
+![Proxy](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/proxy.jpeg)
+
+1. **作用**
+    > 为其他对象提供一种代理，以控制对这种对象的访问
+
+2. **适用场景**
+    
+    - 在需要用比较通用和复杂的对象指针，代替简单的指针时候，使用Proxy模式。
+        - 远程代理：为一个对象在不同的地址空间提供局部代表
+        - 虚代理：根据需要，创建开销很大的对象
+        - 保护代理：控制对原始对象的访问，用于对象应该有不同的访问权限
+        - 智能代理：取代了简单的指针，在访问对象时执行一些附加操作。典型用途：对指向实际对象的引用计数。
+    - 当第一次引用一个持久对象时，将它装入内存
+    - 在访问一个实际对象前，检查是否已经有锁锁定了它，以确保其他对象不能改变它
+    
+    
+3. **样例Demo**
+
+    ```python
+    import time
+    
+    class SaleManager(object):
+        def work(self):
+            print("Sale Manager is working...")
+        
+        def talk(self):
+            print("sale Manager ready to talk.")
+    
+    class Proxy(object):
+        def __init__(self):
+            self.busy = False
+            self.sales = None
+    
+        def work(self):
+            print("Proxy checking for Sale Manager availability.")
+            if not self.busy:
+                self.sales = SaleManager()
+                time.sleep(2)
+                self.sales.talk()
+            else:
+                time.sleep(2)
+                print("Sale Manager is busy.")
+    
+    # Client
+    if __name__ == '__main__':
+        proxy = Proxy()
+        proxy.work()
+        proxy.busy = True
+        proxy.work()
     ```
