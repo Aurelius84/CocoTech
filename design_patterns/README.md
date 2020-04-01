@@ -507,3 +507,79 @@
         foo_decorator.func2()
     ```
 
+#### 10. Facade (外观)
+
+![Facade](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/facade.jpeg)
+
+1. **作用**
+    > 为子系统的一组接口提供一个一致的界面，Facade模式定义了一个高层接口，使得子系统更加容易使用。
+
+2. **适用场景**
+
+    - 当子系统因不断演化而变得复杂，试图为复杂子系统提供一个简单的接口
+    - 大多数模式使用时会产生更多更小的类，试图重用子类，或对子系统进行定制
+    - client端与抽象类的实现部分之间存在很大的依赖性，引入Facade可以将子系统与client和其他子系统分离，提高子系统的独立性和可移植性
+    - 当需构建一个层次结构的子系统时，使用Facade模式定义子系统的每层的入口点
+        - 若子系统之间相互依赖，可借助Facade进行通讯，简化它们之间的依赖关系
+
+3. **样例Demo**
+
+    ```python
+    import time
+    
+    SLEEP = 0.5
+    
+    class TC1(object):
+        def run(self):
+            print("###### In Test 1 ######")
+            time.sleep(SLEEP)
+            print("Setting up")
+            time.sleep(SLEEP)
+            print("Running test")
+            time.sleep(SLEEP)
+            print("Tearing down")
+            time.sleep(SLEEP)
+            print("Test 1 Finished")
+    
+    class TC2(object):
+        def run(self):
+            print("###### In Test 2 ######")
+            time.sleep(SLEEP)
+            print("Setting up")
+            time.sleep(SLEEP)
+            print("Running test")
+            time.sleep(SLEEP)
+            print("Tearing down")
+            time.sleep(SLEEP)
+            print("Test 2 Finished")
+    
+    class TC3(object):
+        def run(self):
+            print("###### In Test 3 ######")
+            time.sleep(SLEEP)
+            print("Setting up")
+            time.sleep(SLEEP)
+            print("Running test")
+            time.sleep(SLEEP)
+            print("Tearing down")
+            time.sleep(SLEEP)
+            print("Test 3 Finished")
+    
+    # Facade
+    class TestRunner(object):
+        def __init__(self):
+            self.tc1 = TC1()
+            self.tc2 = TC2()
+            self.tc3 = TC3()
+            self.tests = [i for i in (self.tc1, self.tc2, self.tc3)]
+            
+        def run_all(self):
+            for test in self.tests:
+                test.run()
+    
+    
+    # Client
+    if __name__ == '__main__':
+        test_runner = TestRunner()
+        test_runner.run_all()
+    ```
