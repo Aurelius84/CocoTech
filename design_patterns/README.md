@@ -583,3 +583,45 @@
         test_runner = TestRunner()
         test_runner.run_all()
     ```
+   
+#### 10. Flyweight (享元)
+
+![Flyweight](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/flyweight.jpeg)
+
+1. **作用**
+    > 借助共享技术，有效地支持大量细粒度的对象
+
+2. **适用场景**
+
+    - 一个应用程序使用了大量的对象，造成了很大的存储开销
+    - 对象的大多数状态都可变为外部状态，如果删除对象的外部状态，则可以用相对较少的共享对象取代很多组多想
+    - 应用程序不依赖于对象标识。由于Flyweight对象可以被共享，对于概念上明显有别的对象，标识测试将返回真值。
+
+3. **样例Demo**
+
+    ```python
+    import weakref
+    
+    
+    class Card(object):
+        _CardPool = weakref.WeakValueDictionary()
+    
+        def __new__(cls, value, suit):
+            obj = Card._CardPool.get(value + suit, None)
+            if not obj:
+                obj = object.__new__(cls)
+                Card._CardPool[value + suit] = obj
+                obj.value, obj.suit = value, suit
+            return obj
+        
+        def __repr__(self):
+            return "<Card: %s%s>" % (self.value, self.suit) 
+    
+    # Client
+    if __name__ == '__main__':
+        c1 = Card("9", "h")
+        c2 = Card("9", "h")
+        print(c1, c2)
+        print(c1 == c2)
+        print(id(c1), id(c2))
+    ```
