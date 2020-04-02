@@ -678,3 +678,48 @@
         proxy.busy = True
         proxy.work()
     ```
+   
+#### 13. Interpreter (解析器)
+
+![Interpreter](https://raw.githubusercontent.com/Aurelius84/CocoTech/master/design_patterns/img/interpreter.jpeg)
+
+1. **作用**
+    > 给定一种语言，定义其文法的一种表示（Expression），并定义一个解释器，此解释器使用此表示（Expression）来解释解释语言中的句子。
+
+2. **适用场景**
+    
+    - 当一种语言需要解释执行，且你可以将此语言中的句子表示为一个AST，可使用解释器模式（待详细完善）
+    
+    
+3. **样例Demo**
+
+    ```python
+    class Context(object):
+        def __init__(self):
+            self.input = ""
+            self.output = ""
+    
+    class AbstractExpression(object):
+        def interpret(self, context):
+            pass
+    
+    class Expresssion(AbstractExpression):
+        def interpret(self, context):
+            print("terminal interpret")
+    
+    class NonterminalExpression(AbstractExpression):
+        def interpret(self, context):
+            print("Nonterminal interpret")
+    
+    
+    # Client
+    if __name__ == '__main__':
+        context = ""
+        c = []
+        c.append(Expresssion())
+        c.append(NonterminalExpression())
+        c.append(Expresssion())
+        c.append(Expresssion())
+        for item in c:
+            c.interpret(context)
+    ```
