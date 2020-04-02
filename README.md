@@ -6,30 +6,30 @@
 
 提供实例化的方法，为适合的情况提供相应的创建方法。
 
-- Factory Method (工厂方法)
-- Abstract Factory (抽象工厂)
-- Builder (建造者)
-- Prototype (原型)
-- Singleton (单例)
+- [Factory Method (工厂方法)](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#1-factory-method-%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95)
+- [Abstract Factory (抽象工厂)](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#2-abstract-factory-%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82)
+- [Builder (建造者)](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#3-builder-%E5%BB%BA%E9%80%A0%E8%80%85)
+- [Prototype (原型)](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#4-prototype-%E5%8E%9F%E5%9E%8B)
+- [Singleton (单例)](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#5-singleton-%E5%8D%95%E4%BE%8B)
 
 ### 1.2 [结构化模式](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#22-%E7%BB%93%E6%9E%84%E5%9E%8B)
 
 用于处理实体之间的关系，使得这些实体可以更好的协同工作。
 
-- Adapter Class/Object (适配器)
-- Bridge（桥接）
-- Composite（组合）
-- Decorator（装饰）
-- Facade（外观）
-- Flyweight（享元）
-- Proxy（代理）　
+- [Adapter Class/Object (适配器)](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#6-adapter-classobject-%E9%80%82%E9%85%8D%E5%99%A8)
+- [Bridge（桥接）](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#7-bridge-%E6%A1%A5%E6%8E%A5)
+- [Composite（组合）](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#8-composite%E7%BB%84%E5%90%88)
+- [Decorator（装饰）](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#9-decorator%E8%A3%85%E9%A5%B0%E5%99%A8)
+- [Facade（外观）](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#10-facade-%E5%A4%96%E8%A7%82)
+- [Flyweight（享元）](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#11-flyweight-%E4%BA%AB%E5%85%83)
+- [Proxy（代理）](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#12-proxy-%E4%BB%A3%E7%90%86)　
 
 ### 1.3 行为模式
 
 用于不同的实体进行通信，为实体之间的通信提供更容易、更灵活的通信方法。
 
-- Interpreter（解释器）
-- Template Method（模板方法）
+- [Interpreter（解释器）](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#13-interpreter-%E8%A7%A3%E6%9E%90%E5%99%A8)
+- [Template Method（模板方法）](https://github.com/Aurelius84/CocoTech/tree/master/design_patterns#14-template-method-%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95)
 - Chain of Responsibility（责任链）
 - Command（命令）
 - Iterator（迭代器）
