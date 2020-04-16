@@ -138,7 +138,6 @@ static const char* parse_string(cJSON *item, const char *str){
                     *ptr2++ = '\t';
                     break;
                 case 'u':
-                    // TODO: to utf-8
                     uc = parse_hex4(ptr+1);
                     ptr+= 4;
                     // check for valid
@@ -256,7 +255,6 @@ static const char *parse_value(cJSON *item, const char *value){
         item->valueint = 1;
         return value + 4;
     }
-    // TODO: add parse function
     if(*value == '\"') {return parse_string(item, value);}
     if(*value == '-' || (*value >= '0' && *value <= '9')) {return parse_number(item, value);}
     if(*value == '[') {return parse_array(item, value);}
@@ -266,13 +264,81 @@ static const char *parse_value(cJSON *item, const char *value){
     return 0; //fail
 }
 
-// TODO: add definations
 static const char *parse_array(cJSON *item, const char *value){
+    cJSON *child;
+    if(*value != '['){
+        ep = value;
+        return 0; // not a array
+    }
+    item->type = cJSON_Array;
+    value = skip(value+1);
+    if(*value == ']') return value + 1; // empty array
+
+    item->child = child = cJSON_New_Item();
+    if(!item->child) return 0; // memory fail
+    value = skip(parse_value(child, skip(value)));
+    if(!value) return 0;
+
+    while(*value == ','){
+        cJSON *new_item;
+        if(!(new_item = cJSON_New_Item())) return 0; // memory fail
+        child->next = new_item;
+        new_item->prev = child;
+        child = new_item;
+        value = skip(parse_value(child, skip(value+1)));
+        if(!value) return 0;
+    }
+
+    if(*value == ']') return value + 1;
+    ep = value;
     return 0;
 }
 
-// TODO: add definations
+// Builds an object from the text
 static const char *parse_object(cJSON *item, const char *value){
+    cJSON *child;
+    if(*value != '{'){
+        ep = value;
+        return 0; // not a object
+    }
+
+    item->type = cJSON_Object;
+    value = skip(value + 1);
+    if(*value == '}') return value + 1; // empty array
+
+    item->child = child = cJSON_New_Item();
+    if(!item->child) return 0; // memory fail
+
+    value = skip(parse_string(child, skip(value)));
+    if(!value) return 0;
+    child->string = child->valuestring;
+    child->valuestring = 0;
+
+    if(*value != ':'){
+        ep = value;
+        return 0;
+    }
+    value = skip(parse_value(child, skip(value + 1)));
+    if(!value) return 0;
+    while(*value == ','){
+        cJSON *new_item;
+        if(!(new_item = cJSON_New_Item())) return 0; //memory fail
+        child->next = new_item;
+        new_item->prev = child;
+        child = new_item;
+        value = skip(parse_string(child, skip(value + 1)));
+        if(!value) return 0;
+        child->string = child->valuestring;
+        child->valuestring = 0;
+        if(*value != ':'){
+            ep = value;
+            return 0;
+        }
+        value = skip(parse_value(child, skip(value+1)));
+        if(!value) return 0;
+    }
+    if(*value == '}') return value + 1;
+    ep = value;
     return 0;
 }
 
