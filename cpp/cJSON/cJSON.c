@@ -11,6 +11,14 @@
 #include <limits.h>
 #include "cJSON.h"
 
+
+typedef struct {
+    char *buffer;
+    int length;
+    int offset;
+} printbuffer;
+
+
 /*
  * 静态变量可以声明于function中， 其lifetime从第一次调用此函数开始，一直到program结束；
  * 静态变量只执行一次初始化，并保存在heap中，发生修改就保存。
@@ -19,6 +27,9 @@
  */
 
 static const char *ep;
+
+// 返回解析错误时，char的起始指针
+const char *cJSON_GetErrorPtr(void) { return ep; }
 
 /* Parse the input text into an unescaped cstring, and populate item. */
 static const unsigned char firstByteMask[7] = {0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC};
@@ -63,9 +74,48 @@ static void *(*cJSON_malloc)(size_t sz) = malloc;
  */
 static void (*cJSON_free)(void *ptr) = free;
 
+static int pow2gt(int x) {
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+}
+
+static char *ensure(printbuffer *p, int needed) {
+    char *newbuffer;
+    int newsize;
+    if (!p || !p->buffer) return 0;
+    needed += p->offset;
+    // 从buffer中取出needed的char，事先需要确认buffer的内容长度满足要求
+    if (needed <= p->length) return p->buffer + p->offset;
+
+    // 通过位移操作，计算出离不小于needed的最小平方数，
+    // 如：5(二进制：101)，返回8(二进制为 1000)
+    newsize = pow2gt(needed);
+    newbuffer = (char *) cJSON_malloc(newsize);
+    if (!newbuffer) {
+        /*
+         * 这里对newbuffer申请内存失败，为什么要清掉p呢？
+         */
+        cJSON_free(p->buffer);
+        p->length = 0;
+        p->buffer = 0;
+        return 0;
+    }
+    if (newbuffer) memcpy(newbuffer, p->buffer, p->length);
+    // 将之前的buffer 拷贝到新的地址下
+    cJSON_free(p->buffer);
+    p->length = newsize;
+    p->buffer = newbuffer;
+    return newbuffer + p->offset;
+}
+
 // skip whitespace and cr/lf
-static const char *skip(const char *in){
-    while(in && *in && (unsigned char) *in <= 32) in ++;
+static const char *skip(const char *in) {
+    while (in && *in && (unsigned char) *in <= 32) in++;
     return in;
 }
 
@@ -96,7 +146,7 @@ static unsigned parse_hex4(const char *str) {
     return h;
 }
 
-static const char* parse_string(cJSON *item, const char *str){
+static const char *parse_string(cJSON *item, const char *str) {
     // 忽略前面的"
     const char *ptr = str + 1;
     char *ptr2;
@@ -104,24 +154,24 @@ static const char* parse_string(cJSON *item, const char *str){
     int len = 0;
     // 等价于unsigned int，int是隐含的
     unsigned uc, uc2;
-    if(*str != '\"'){
+    if (*str != '\"') {
         ep = str;
         return 0; // not a string
     }
-    while(*ptr != '\"' && *ptr && ++len){
-        if(*ptr++ == '\\') ptr ++; // skip escaped quota
+    while (*ptr != '\"' && *ptr && ++len) {
+        if (*ptr++ == '\\') ptr++; // skip escaped quota
     }
 
-    out = (char *) cJSON_malloc(len+1);
-    if(!out) return 0;
+    out = (char *) cJSON_malloc(len + 1);
+    if (!out) return 0;
 
     ptr = str + 1;
     ptr2 = out;
-    while(*ptr != '\"' && *ptr) {
-        if(*ptr != '\\') *ptr2++ = *ptr++;
-        else{
+    while (*ptr != '\"' && *ptr) {
+        if (*ptr != '\\') *ptr2++ = *ptr++;
+        else {
             ptr++;
-            switch(*ptr){
+            switch (*ptr) {
                 case 'b':
                     *ptr2++ = '\b';
                     break;
@@ -138,29 +188,29 @@ static const char* parse_string(cJSON *item, const char *str){
                     *ptr2++ = '\t';
                     break;
                 case 'u':
-                    uc = parse_hex4(ptr+1);
-                    ptr+= 4;
+                    uc = parse_hex4(ptr + 1);
+                    ptr += 4;
                     // check for valid
-                    if((uc >=0xDC00 && uc <= 0xDFFF) || uc ==0) break;
-                    if((uc >=0xD800 && uc <= 0xDBFF)){
+                    if ((uc >= 0xDC00 && uc <= 0xDFFF) || uc == 0) break;
+                    if ((uc >= 0xD800 && uc <= 0xDBFF)) {
                         /* missing second-half of surrogate.	*/
-                        if (ptr[1] != '\\' || ptr[2] !='u') break;
-                        uc2 = parse_hex4(ptr+3);
-                        ptr+=6;
-                        if(uc >=0xDC00 && uc <= 0xDFFF) break;
-                        uc = 0x10000 + (((uc &0x3FF)<<10) | (uc2 & 0x3FF));
+                        if (ptr[1] != '\\' || ptr[2] != 'u') break;
+                        uc2 = parse_hex4(ptr + 3);
+                        ptr += 6;
+                        if (uc >= 0xDC00 && uc <= 0xDFFF) break;
+                        uc = 0x10000 + (((uc & 0x3FF) << 10) | (uc2 & 0x3FF));
                     }
                     len = 4;
-                    if(uc < 0x80) len = 1;
-                    else if(uc < 0x800) len = 2;
-                    else if(uc < 0x10000) len = 3;
+                    if (uc < 0x80) len = 1;
+                    else if (uc < 0x800) len = 2;
+                    else if (uc < 0x10000) len = 3;
 
                     ptr += len;
 
-                    switch(len){
+                    switch (len) {
                         case 4:
                             *--ptr2 = ((uc | 0x80) & 0xBF);
-                            uc >>=6;
+                            uc >>= 6;
                         case 3:
                             *--ptr2 = ((uc | 0x80) & 0xBF);
                             uc >>= 6;
@@ -180,42 +230,42 @@ static const char* parse_string(cJSON *item, const char *str){
         }
     }
     *ptr2 = 0;
-    if(*ptr == '\"') ptr ++;
+    if (*ptr == '\"') ptr++;
     item->valuestring = out;
     item->type = cJSON_String;
     return ptr;
 }
 
-const char *parse_number(cJSON *item, const char*num){
-    double n =0, sign = 1, scale = 0;
+const char *parse_number(cJSON *item, const char *num) {
+    double n = 0, sign = 1, scale = 0;
     int subscale = 0, signsuscale = 1;
 
-    if(*num == '-'){
+    if (*num == '-') {
         sign = -1;
         num++;
     }
-    if(*num == '0') num++;
-    if(*num >= '1' & *num <= '9') {
-        do n = (n * 10) + (*num++ -'0');
-        while (*num >='0' & *num <= '9');
+    if (*num == '0') num++;
+    if (*num >= '1' & *num <= '9') {
+        do n = (n * 10) + (*num++ - '0');
+        while (*num >= '0' & *num <= '9');
     }
-    if(*num == '.' && num[1] >='0' && num[1] <= '9'){
+    if (*num == '.' && num[1] >= '0' && num[1] <= '9') {
         num++;
         do n = (n * 10.0) + (*num++ - '0'), scale--;
         while (*num >= '0' && *num <= '9');
     }
-    if(*num == 'e' || *num =='E'){
+    if (*num == 'e' || *num == 'E') {
         num++;
-        if(*num =='+') num++;
-        else if(*num == '-'){
+        if (*num == '+') num++;
+        else if (*num == '-') {
             signsuscale = -1;
             num++;
         }
-        while(*num >='0' && *num <= '9')
-            subscale = (subscale*10) + (*num++ - '0');
+        while (*num >= '0' && *num <= '9')
+            subscale = (subscale * 10) + (*num++ - '0');
     }
 
-    n = sign * n * pow(10.0, (scale + subscale*signsuscale));
+    n = sign * n * pow(10.0, (scale + subscale * signsuscale));
 
     item->valuedouble = n;
     item->valueint = (int) n;
@@ -234,125 +284,125 @@ const char *parse_number(cJSON *item, const char*num){
  *   2. 不能在静态成员函数里访问类的非静态成员，因为实例化的对象存放在局部变量区，静态成员存在在全局变量区
  *   3. 不能将静态成员函数定义为虚函数
  */
-static const char *parse_value(cJSON *item, const char *value){
-    if(!value)  return 0;
+static const char *parse_value(cJSON *item, const char *value) {
+    if (!value) return 0;
     /* 若前n个字符相同，则返回0
      * C++中 单引号是字符型(实际代表一个整数)，双引号是字符串型(指向吴明数组起始字符的指针)
      * 'a' 表示一个字符，"a"相当于'a' + '\0'
      */
-    if(!strncmp(value, "null", 4)){
+    if (!strncmp(value, "null", 4)) {
         item->type = cJSON_NULL;
         return value + 4;
     }
 
-    if(!strncmp(value, "false", 5)){
+    if (!strncmp(value, "false", 5)) {
         item->type = cJSON_False;
         return value + 5;
     }
 
-    if(!strncmp(value, "true", 4)){
+    if (!strncmp(value, "true", 4)) {
         item->type = cJSON_True;
         item->valueint = 1;
         return value + 4;
     }
-    if(*value == '\"') {return parse_string(item, value);}
-    if(*value == '-' || (*value >= '0' && *value <= '9')) {return parse_number(item, value);}
-    if(*value == '[') {return parse_array(item, value);}
-    if(*value == '{') {return parse_object(item, value);}
+    if (*value == '\"') { return parse_string(item, value); }
+    if (*value == '-' || (*value >= '0' && *value <= '9')) { return parse_number(item, value); }
+    if (*value == '[') { return parse_array(item, value); }
+    if (*value == '{') { return parse_object(item, value); }
 
     ep = value;
     return 0; //fail
 }
 
-static const char *parse_array(cJSON *item, const char *value){
+static const char *parse_array(cJSON *item, const char *value) {
     cJSON *child;
-    if(*value != '['){
+    if (*value != '[') {
         ep = value;
         return 0; // not a array
     }
     item->type = cJSON_Array;
-    value = skip(value+1);
-    if(*value == ']') return value + 1; // empty array
+    value = skip(value + 1);
+    if (*value == ']') return value + 1; // empty array
 
     item->child = child = cJSON_New_Item();
-    if(!item->child) return 0; // memory fail
+    if (!item->child) return 0; // memory fail
     value = skip(parse_value(child, skip(value)));
-    if(!value) return 0;
+    if (!value) return 0;
 
-    while(*value == ','){
+    while (*value == ',') {
         cJSON *new_item;
-        if(!(new_item = cJSON_New_Item())) return 0; // memory fail
+        if (!(new_item = cJSON_New_Item())) return 0; // memory fail
         child->next = new_item;
         new_item->prev = child;
         child = new_item;
-        value = skip(parse_value(child, skip(value+1)));
-        if(!value) return 0;
+        value = skip(parse_value(child, skip(value + 1)));
+        if (!value) return 0;
     }
 
-    if(*value == ']') return value + 1;
+    if (*value == ']') return value + 1;
     ep = value;
     return 0;
 }
 
 // Builds an object from the text
-static const char *parse_object(cJSON *item, const char *value){
+static const char *parse_object(cJSON *item, const char *value) {
     cJSON *child;
-    if(*value != '{'){
+    if (*value != '{') {
         ep = value;
         return 0; // not a object
     }
 
     item->type = cJSON_Object;
     value = skip(value + 1);
-    if(*value == '}') return value + 1; // empty array
+    if (*value == '}') return value + 1; // empty array
 
     item->child = child = cJSON_New_Item();
-    if(!item->child) return 0; // memory fail
+    if (!item->child) return 0; // memory fail
 
     value = skip(parse_string(child, skip(value)));
-    if(!value) return 0;
+    if (!value) return 0;
     child->string = child->valuestring;
     child->valuestring = 0;
 
-    if(*value != ':'){
+    if (*value != ':') {
         ep = value;
         return 0;
     }
     value = skip(parse_value(child, skip(value + 1)));
-    if(!value) return 0;
-    while(*value == ','){
+    if (!value) return 0;
+    while (*value == ',') {
         cJSON *new_item;
-        if(!(new_item = cJSON_New_Item())) return 0; //memory fail
+        if (!(new_item = cJSON_New_Item())) return 0; //memory fail
         child->next = new_item;
         new_item->prev = child;
         child = new_item;
         value = skip(parse_string(child, skip(value + 1)));
-        if(!value) return 0;
+        if (!value) return 0;
         child->string = child->valuestring;
         child->valuestring = 0;
-        if(*value != ':'){
+        if (*value != ':') {
             ep = value;
             return 0;
         }
-        value = skip(parse_value(child, skip(value+1)));
-        if(!value) return 0;
+        value = skip(parse_value(child, skip(value + 1)));
+        if (!value) return 0;
     }
-    if(*value == '}') return value + 1;
+    if (*value == '}') return value + 1;
     ep = value;
     return 0;
 }
 
-cJSON *cJSON_Parse(const char *value){
+cJSON *cJSON_Parse(const char *value) {
     return cJSON_ParseWithOpts(value, 0, 0);
 }
 
-void cJSON_Delete(cJSON *c){
+void cJSON_Delete(cJSON *c) {
     cJSON *next;
-    while(c){
+    while (c) {
         next = c->next;
-        if(!(c->type & cJSON_IsReference) && c->child) cJSON_Delete(c->child);
-        if(!(c->type & cJSON_IsReference) && c->valuestring) cJSON_free(c->valuestring);
-        if(!(c->type & cJSON_StringIsConst) && c->string) cJSON_free(c->string);
+        if (!(c->type & cJSON_IsReference) && c->child) cJSON_Delete(c->child);
+        if (!(c->type & cJSON_IsReference) && c->valuestring) cJSON_free(c->valuestring);
+        if (!(c->type & cJSON_StringIsConst) && c->string) cJSON_free(c->string);
         cJSON_free(c);
         c = next;
     }
@@ -362,34 +412,128 @@ cJSON *cJSON_ParseWithOpts(const char *value, const char **return_parse_end, int
     const char *end = 0;
     cJSON *c = cJSON_New_Item();
     ep = 0;
-    if(!c) return 0;  // memory fail
+    if (!c) return 0;  // memory fail
 
     // return pointer pointing the end of char* value
     end = parse_value(c, skip(value));
 
-    if(!end){
+    if (!end) {
         cJSON_Delete(c);
         return 0; // parse failure, ep is set
     }
 
-    if(require_null_terminated){
+    if (require_null_terminated) {
         end = skip(end);
-        if(*end){
+        if (*end) {
             cJSON_Delete(c);
             ep = end;
             return 0;
         }
     }
-    if(return_parse_end) *return_parse_end = end;
+    if (return_parse_end) *return_parse_end = end;
     return c;
 }
 
 
-cJSON *cJSON_New_Item(){
+// TODO: add defination
+static char *print_number(cJSON *item, printbuffer *p){
+    return 0;
+}
+
+// TODO: add defination
+static char *print_array(cJSON *item, int depth, int fmt, printbuffer *p){
+    return 0;
+}
+
+
+static char *print_string(cJSON *item, printbuffer *p){
+    return  0;
+}
+
+static char *print_object(cJSON *item, int depth, int fmt, printbuffer *p){
+    return 0;
+}
+
+static char *cJSON_strdup(const char *str){
+    return 0;
+}
+
+
+
+// TODO: add defination
+static char *print_value(cJSON *item, int depth, int fmt, printbuffer *p) {
+    char *out = 0;
+    if (!item) return 0;
+    if (p) {
+        switch ((item->type) & 255) {
+            case cJSON_NULL: {
+                out = ensure(p, 5);
+                if (out) strcpy(out, "null");
+                break;
+            }
+            case cJSON_False: {
+                out = ensure(p, 6);
+                if (out) strcpy(out, "false");
+                break;
+            }
+            case cJSON_True: {
+                out = ensure(p, 5);
+                if (out) strcpy(out, "true");
+                break;
+            }
+            case cJSON_Number: {
+                out = print_number(item, p);
+                break;
+            }
+            case cJSON_Array: {
+                out = print_array(item, depth, fmt, p);
+                break;
+            }
+            case cJSON_String: {
+                out = print_string(item, p);
+                break;
+            }
+            case cJSON_Object: {
+                out = print_object(item, depth, fmt, p);
+                break;
+            }
+        }
+    } else {
+        switch ((item->type) & 255) {
+            case cJSON_NULL:
+                out = cJSON_strdup("null");
+                break;
+            case cJSON_False:
+                out = cJSON_strdup("false");
+                break;
+            case cJSON_True:
+                out = cJSON_strdup("true");
+                break;
+            case cJSON_Number:
+                out = print_number(item, 0);
+                break;
+            case cJSON_String:
+                out = print_string(item, 0);
+                break;
+            case cJSON_Array:
+                out = print_array(item, depth, fmt, 0);
+                break;
+            case cJSON_Object:
+                out = print_object(item, depth, fmt, 0);
+                break;
+        }
+    }
+    return out;
+}
+
+char *cJSON_Print(cJSON *item) { return print_value(item, 0, 1, 0); }
+
+
+cJSON *cJSON_New_Item() {
     // 通过函数指针，实际调用的是malloc(sizeof(cJSON))
     cJSON *node = (cJSON *) cJSON_malloc(sizeof(cJSON));
     // 结构体常见的初始化方式
-    if(node) memset(node, 0, sizeof(cJSON));
+    if (node) memset(node, 0, sizeof(cJSON));
     return node;
 }
 

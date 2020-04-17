@@ -48,5 +48,9 @@ extern cJSON *cJSON_New_Item();
 /* Delete a cJSON entity and all subentities. */
 extern void cJSON_Delete(cJSON *c);
 
+extern const char *cJSON_GetErrorPtr(void);
+
+extern char *cJSON_Print(cJSON *item);
+
 
 #endif //CJSON_H
