@@ -39,3 +39,4 @@
 
 # cmake dir
 cmake-build*
+.DS_Store

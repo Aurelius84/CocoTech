@@ -437,7 +437,31 @@ cJSON *cJSON_ParseWithOpts(const char *value, const char **return_parse_end, int
 
 // TODO: add defination
 static char *print_number(cJSON *item, printbuffer *p){
-    return 0;
+    char *str = 0;
+    double d = item->valuedouble;
+    if(d ==0){
+        if(p) str = ensure(p, 2);
+        else str = (char *) cJSON_malloc(2);
+        if(str) strcpy(str, "0");
+    } else if(fabs((double)item->valueint - d) <= DBL_EPSILON && d <= INT_MAX && d >= INT_MIN){
+        if(p) str = ensure(p, 21);
+        else str = (char *) cJSON_malloc(21);
+        if(str) sprinf(str, "%d", item->valueint);
+    }else {
+        if(p) str = ensure(p, 64);
+        else str = (char *) cJSON_malloc(64);
+        if(str) {
+            if(fabs(floor(d)-d) <= DBL_EPSILON && fabs(d) < 1.0e60) {
+                sprintf(str, "%.0f",d);
+            }
+            else if(fabs(d) < 1.0e-6 || fabs(d) > 1.0e9){
+                sprintf(str, "%e", d);
+            }else{
+                sprintf(str, "%f", d);
+            }
+        }
+    }
+    return str;
 }
 
 // TODO: add defination
